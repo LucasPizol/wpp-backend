@@ -1,5 +1,3 @@
-import { Types } from "mongoose";
-import { AuthRequest } from "../middleware/check_authorization";
 import { prisma } from "../prisma";
 import { encrypt } from "../encrypt";
 

@@ -2,7 +2,6 @@ import { Message } from "whatsapp-web.js";
 import { prisma } from "../prisma";
 import {
   CustomerType,
-  MessageEnum,
   customers,
 } from "../whatsapp/whatsapp.functions";
 import { customerService } from "../services/customer.service";

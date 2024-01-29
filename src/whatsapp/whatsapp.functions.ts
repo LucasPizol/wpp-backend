@@ -1,12 +1,9 @@
-import { io, sockets } from "..";
+import { io } from "..";
 import { client } from "./client";
 import qrcode from "qrcode";
 import { messages } from "../messages/messages";
-import { messageService } from "../services/message.service";
 import { customerService } from "../services/customer.service";
 import { prisma } from "../prisma";
-import { decrypt } from "../encrypt";
-import { userService } from "../services/user.service";
 
 export enum MessageEnum {
   FIRST_CONTACT = "First Contact",
@@ -52,7 +49,7 @@ client.on("qr", (qr) => {
 
 client.on("authenticated", () => {
   qrString = undefined;
-  io.emit("scanned")
+  io.emit("scanned");
   console.log("Client authenticated successfully");
 });
 
