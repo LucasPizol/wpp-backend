@@ -1,0 +1,98 @@
+POST /login
+  body: 
+    username: String value for the username
+    password: String value for the password of the username
+
+  res:
+    200 : OK - response: {
+      name: "Lucas",
+      username: "lucas.pizol",
+      token: "RANDOM_JWT_TOKEN"
+    }
+    
+    401 : Not Authorized
+
+
+GET /customer <REQUIRES AUTH>
+  res:
+    200: OK - response: {
+      "data": [
+          {
+              "id": 1,
+              "name": "Nome",
+              "number": "55999999999@c.us"
+          }
+      ]
+  }
+    401: Authorization Failed,
+    404: No users registered
+
+
+PUT /customer/name/:id <REQUIRES AUTH>
+  body: :
+    name: string (new name)
+
+  res: 
+    204 - OK
+    400 - PUT REQUEST FAILED
+
+
+PUT /customer/session/:id <REQUIRES AUTH>
+  body: null
+  res: 
+    204 - OK
+    400 - PUT REQUEST FAILED
+
+
+POST /message <REQUIRES AUTH>
+  body: 
+    content: string
+    idCustomer: number
+  res:
+    200: OK - response: 
+      {
+          message: {
+            id: 1,
+            idCustomer: 1
+            idUser: 1,
+            content: "asfgasuioghjaw1238w89dasff",
+            createdAt: "2024-01-01",
+            recieved: false
+        }
+      }
+    
+    400: An Error Occurred
+
+
+GET /message <REQUIRES AUTH>
+  query: 
+    idCustomer: number
+  res:
+    200: OK - response: 
+      {
+          messages: [
+            {
+              id: 1,
+              idCustomer: 1
+              idUser: 1,
+              content: "Olá, mundo",
+              createdAt: "2024-01-01",
+              recieved: false
+          }
+        ]
+      }
+    
+    400: An Error Occurred
+
+GET /users/current <REQUIRES AUTH>
+  res:
+    200: OK - response: {
+    "user": {
+        "id": 1,
+        "name": "Lucas",
+        "username": "lucas.pizol",
+        "password": "*****",
+        "idDepartment": 1
+    }
+}
+    400: An Error Occurred

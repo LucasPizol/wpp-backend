@@ -1,6 +1,7 @@
-import mysql from "mysql2/promise";
-import dotenv from "dotenv";
+import mongoose from "mongoose";
+import { env } from "../lib/env";
+import mysql from "mysql2";
 
-dotenv.config();
+export let db = mysql.createPool(env.DATABASE_URL);
 
-export const db = mysql.createPool(String(process.env.DATABASE_URL));
+export default mongoose;

@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int               @id @default(autoincrement())
+  name          String
+  username      String
+  password      String
+  idDepartment  Int
+  department    Department        @relation(fields: [idDepartment], references: [id])
+  lastMessages  LastMessage[]
+  messages      Message[]
+  customers     Customer[]
+}
+
+model Department {
+  id              Int             @id @default(autoincrement())
+  name            String          @unique
+  users           User[]
+  palavraChave    PalavraChave[]
+}
+
+model PalavraChave {
+  id              Int             @id @default(autoincrement())
+  name            String          @unique
+  idDepartment    Int 
+  department      Department      @relation(fields: [idDepartment], references: [id])
+}
+
+model Customer {
+  id              Int             @id @default(autoincrement())
+  name            String
+  number          String
+  messages        Message[]
+  last_messages   LastMessage[]
+  userActive      Int? 
+  user            User?           @relation(fields: [userActive], references: [id])
+}
+
+model Message {
+  id            Int               @id @default(autoincrement())
+  content       String 
+  createdAt     DateTime          @default(now())
+  idCustomer    Int?
+  customer      Customer?         @relation(fields: [idCustomer], references: [id])
+  user          User?             @relation(fields: [idUser], references: [id])
+  idUser        Int?
+  recieved      Boolean
+  last_messages LastMessage[]
+  notifications Notification[]
+  type          String
+  media         String?
+}
+
+model LastMessage {
+  id    Int     @id @default(autoincrement())
+  message       Message? @relation(fields: [idMessage], references: [id])
+  idMessage     Int?
+  user          User @relation(fields: [idUser], references: [id])
+  idUser        Int
+  customer      Customer @relation(fields: [idCustomer], references: [id])
+  idCustomer    Int
+}
+
+model Notification {
+  id    Int         @id @default(autoincrement())
+  idMessage Int     @unique
+  message Message   @relation(fields: [idMessage], references: [id])
+}

@@ -1,8 +1,7 @@
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+import { env } from "../lib/env";
 
-dotenv.config();
-const secret = String(process.env.JWT_SECRET);
+const secret = String(env.JWT_SECRET);
 
 export const jwtService = {
   verifyToken: (token: string, callbackfn: jwt.VerifyCallback) => {
