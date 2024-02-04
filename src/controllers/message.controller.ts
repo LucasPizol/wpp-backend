@@ -32,14 +32,14 @@ export const messageController = {
         },
       });
 
-      const number = customers.find((customer) => customer.id === idCustomer);
+      const number = customers.find((customer) => customer.getId() === idCustomer);
 
       if (!number) {
         throw new Error("Erro, número não encontrado");
       }
 
       client.sendMessage(
-        number?.number,
+        number?.getNumber(),
         `*${user.name}*
 ${content}`
       );
@@ -63,7 +63,7 @@ ${content}`
         },
       });
 
-      const messagesDecrypted = messages.map((message) => {
+      const messagesDecrypted = messages.map((message: any) => {
         return {
           ...message,
           content: decrypt(message.content),

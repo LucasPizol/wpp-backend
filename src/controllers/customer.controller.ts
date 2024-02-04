@@ -3,6 +3,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/check_authorization";
 import { decrypt } from "../encrypt";
 import { MessageEnum, customers } from "../whatsapp/whatsapp.functions";
+import { Customer } from "../classes/Customer";
 
 export const customerController = {
   getCustomers: async (req: AuthRequest, res: Response) => {
@@ -62,10 +63,10 @@ export const customerController = {
         },
       });
 
-      const customerIndex = customers.findIndex(
-        (customer) => customer.id === Number(id)
+      const findCustomer = customers.find(
+        (customer) => customer.getId() === Number(id)
       );
-      customers[customerIndex].name = name;
+      findCustomer?.setName(name);
       return res.status(204).send();
     } catch (error: any) {
       return res
@@ -87,11 +88,11 @@ export const customerController = {
         },
       });
 
-      const findIndex = customers.findIndex(
-        (customer) => customer.id === Number(id)
+      const findCustomer = customers.find(
+        (customer) => customer.getId() === Number(id)
       );
 
-      customers[findIndex].messageType = MessageEnum.FIRST_CONTACT;
+      findCustomer?.setMessageType(MessageEnum.FIRST_CONTACT);
 
       return res.status(204).send();
     } catch (error: any) {

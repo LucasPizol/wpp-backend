@@ -52,8 +52,8 @@ model Message {
   createdAt     DateTime          @default(now())
   idCustomer    Int?
   customer      Customer?         @relation(fields: [idCustomer], references: [id])
-  user          User?             @relation(fields: [idUser], references: [id])
   idUser        Int?
+  user          User?             @relation(fields: [idUser], references: [id])
   recieved      Boolean
   last_messages LastMessage[]
   notifications Notification[]

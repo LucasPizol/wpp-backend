@@ -4,6 +4,7 @@ import qrcode from "qrcode";
 import { messages } from "../messages/messages";
 import { customerService } from "../services/customer.service";
 import { prisma } from "../prisma";
+import { Customer } from "../classes/Customer";
 
 export enum MessageEnum {
   FIRST_CONTACT = "First Contact",
@@ -24,16 +25,26 @@ export type CustomerType = {
   }[];
 };
 
-export const customers: CustomerType[] = [];
+export const customers: Customer[] = [];
 
 customerService.getCustomers().then((customersList) => {
-  customersList?.data?.map((customer) => {
+  customersList?.data?.map((customer: any) => {
+    const newCustomer = new Customer(
+      customer.id,
+      customer.name,
+      customer.number,
+      customer.last_messages,
+      MessageEnum.SESSION_ACTIVE,
+      customer.userActive
+    );
+
     if (customer.userActive) {
-      customers.push({ ...customer, messageType: MessageEnum.SESSION_ACTIVE });
+      customers.push(newCustomer);
       return;
     }
 
-    customers.push({ ...customer, messageType: MessageEnum.FIRST_CONTACT });
+    newCustomer.setMessageType(MessageEnum.FIRST_CONTACT);
+    customers.push(newCustomer);
   });
 });
 
@@ -60,11 +71,11 @@ client.on("message", async (message) => {
   )
     return;
 
-  const findCustomerIndex = customers.findIndex(
-    (customer) => customer.number === message.from
+  const findCustomer = customers.find(
+    (customer) => customer.getNumber() === message.from
   );
 
-  if (findCustomerIndex === -1) {
+  if (!findCustomer) {
     const customer = await messages.firstContact(message);
 
     const newCustomer = await prisma.customer.create({
@@ -76,41 +87,40 @@ client.on("message", async (message) => {
 
     if (!customer || !customer.data) return;
 
-    customers.push({
-      ...newCustomer,
-      messageType: MessageEnum.CHOOSING_DEPARTMENT,
-      last_messages: [],
-    });
+    const customerObject = new Customer(
+      newCustomer.id,
+      newCustomer.name,
+      newCustomer.number,
+      [],
+      MessageEnum.CHOOSING_DEPARTMENT,
+      newCustomer.userActive
+    );
+
+    customers.push(customerObject);
     return;
   }
 
-  if (customers[findCustomerIndex].messageType === MessageEnum.FIRST_CONTACT) {
+  if (findCustomer.getMessageType() === MessageEnum.FIRST_CONTACT) {
     await messages.firstContact(message);
 
-    if (customers[findCustomerIndex]) {
-      customers[findCustomerIndex].messageType =
-        MessageEnum.CHOOSING_DEPARTMENT;
+    if (findCustomer) {
+      findCustomer.setMessageType(MessageEnum.CHOOSING_DEPARTMENT);
     }
     return;
   }
 
-  if (
-    customers[findCustomerIndex].messageType === MessageEnum.CHOOSING_DEPARTMENT
-  ) {
-    const index = await messages.choosingDepartment(
-      message,
-      customers[findCustomerIndex]
-    );
+  if (findCustomer.getMessageType() === MessageEnum.CHOOSING_DEPARTMENT) {
+    const index = await messages.choosingDepartment(message, findCustomer);
 
     if (!index || !index.data) return;
 
-    customers[findCustomerIndex].userActive = index.data;
-    customers[findCustomerIndex].messageType = MessageEnum.SESSION_ACTIVE;
+    findCustomer.setUserActive(index.data);
+    findCustomer.setMessageType(MessageEnum.SESSION_ACTIVE);
 
     return;
   }
 
-  if (customers[findCustomerIndex].messageType === MessageEnum.SESSION_ACTIVE) {
-    await messages.activeSession(message, customers[findCustomerIndex]);
+  if (findCustomer.getMessageType() === MessageEnum.SESSION_ACTIVE) {
+    await messages.activeSession(message, findCustomer);
   }
 });

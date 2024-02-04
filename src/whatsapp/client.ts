@@ -1,9 +1,8 @@
 import { Client, LocalAuth } from "whatsapp-web.js";
 
 export const client = new Client({
-  authStrategy: new LocalAuth(),
+  authStrategy: new LocalAuth()
 });
-
 
 client.initialize().then(() => {
   console.log("Client Whatsapp Initialized");

@@ -15,9 +15,9 @@ export const messageService = {
           content: encrypt(content),
           recieved: true,
           idCustomer,
+          idUser,
           type,
           media: media ? encrypt(media) : null,
-          idUser,
         },
       });
 
